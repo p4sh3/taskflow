@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TaskFlow — sistema de gestión de tareas con TypeScript y Vite." />
+  <meta name="theme-color" content="#07101f" />
+  <title>TaskFlow — Gestión de tareas</title>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="TaskFlow, inicio">
+        <span class="brand-mark" aria-hidden="true">✓</span>
+        <span class="brand-copy">
+          <strong>TaskFlow</strong>
+          <span>Organiza. Prioriza. Completa.</span>
+        </span>
+      </a>
+
+      <button class="primary-button" id="new-task-btn" type="button">
+        <span aria-hidden="true">＋</span>
+        Nueva tarea
+      </button>
+    </header>
+
+    <main class="content">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">PANEL DE CONTROL</p>
+          <h1 id="page-title">Tus tareas, bajo control.</h1>
+          <p class="hero-copy">
+            Gestiona tus pendientes desde un solo lugar y mantén el foco en lo importante.
+          </p>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="Resumen de tareas">
+        <article class="stat-card">
+          <span>Total</span>
+          <strong id="stat-total">0</strong>
+          <small>todas tus tareas</small>
+        </article>
+        <article class="stat-card">
+          <span>Pendientes</span>
+          <strong id="stat-pending">0</strong>
+          <small>por completar</small>
+        </article>
+        <article class="stat-card">
+          <span>Completadas</span>
+          <strong id="stat-completed">0</strong>
+          <small>trabajo realizado</small>
+        </article>
+        <article class="stat-card accent">
+          <span>Alta prioridad</span>
+          <strong id="stat-high">0</strong>
+          <small>requieren atención</small>
+        </article>
+      </section>
+
+      <section class="task-section" aria-labelledby="tasks-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">TAREAS</p>
+            <h2 id="tasks-heading">Tu lista</h2>
+          </div>
+          <p class="result-count" id="result-count">0 tareas</p>
+        </div>
+
+        <form class="toolbar" id="filters-form" aria-label="Filtros y búsqueda">
+          <label class="search-box" for="search-input">
+            <span aria-hidden="true">⌕</span>
+            <input id="search-input" name="search" type="search" placeholder="Buscar por título..."
+              autocomplete="off" />
+          </label>
+
+          <label class="select-box" for="status-filter">
+            <span>Estado</span>
+            <select id="status-filter" name="status">
+              <option value="all">Todas</option>
+              <option value="pending">Pendientes</option>
+              <option value="completed">Completadas</option>
+            </select>
+          </label>
+
+          <label class="select-box" for="priority-filter">
+            <span>Prioridad</span>
+            <select id="priority-filter" name="priority">
+              <option value="all">Todas</option>
+              <option value="high">Alta</option>
+              <option value="medium">Media</option>
+              <option value="low">Baja</option>
+            </select>
+          </label>
+
+          <button class="secondary-button reset-button" id="reset-filters-btn" type="reset">
+            Limpiar
+          </button>
+        </form>
+
+        <div class="task-list" id="task-list" aria-live="polite"></div>
+
+        <section class="empty-state" id="empty-state" hidden aria-labelledby="empty-title">
+          <div class="empty-icon" aria-hidden="true">✓</div>
+          <h2 id="empty-title">No encontramos tareas</h2>
+          <p>Prueba con otros filtros o crea una nueva tarea.</p>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>TaskFlow · TypeScript + Vite · Persistencia local</p>
+    </footer>
+  </div>
+
+  <dialog class="task-modal" id="task-modal" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <header class="modal-header">
+        <div>
+          <p class="eyebrow">GESTIÓN</p>
+          <h2 id="modal-title">Nueva tarea</h2>
+        </div>
+        <button class="icon-button" id="close-modal-btn" type="button" aria-label="Cerrar ventana">
+          ×
+        </button>
+      </header>
+
+      <form id="task-form">
+        <div class="form-grid">
+          <label class="field full" for="task-title">
+            <span>Título <b aria-hidden="true">*</b></span>
+            <input id="task-title" name="title" type="text" maxlength="120" required />
+          </label>
+
+          <label class="field full" for="task-description">
+            <span>Descripción</span>
+            <textarea id="task-description" name="description" rows="4" maxlength="500"></textarea>
+          </label>
+
+          <label class="field" for="task-category">
+            <span>Categoría</span>
+            <select id="task-category" name="category">
+              <option value="Trabajo">Trabajo</option>
+              <option value="Personal">Personal</option>
+              <option value="Estudio">Estudio</option>
+              <option value="Salud">Salud</option>
+              <option value="Otros" selected>Otros</option>
+            </select>
+          </label>
+
+          <label class="field" for="task-priority">
+            <span>Prioridad</span>
+            <select id="task-priority" name="priority">
+              <option value="high">Alta</option>
+              <option value="medium" selected>Media</option>
+              <option value="low">Baja</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button id="cancel-modal-btn" type="button" class="secondary-button">Cancelar</button>
+          <button id="submit-btn" type="submit" class="primary-button">Crear tarea</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- La estructura visual de cada tarea también pertenece al HTML. TypeScript solo la clona y rellena. -->
+  <template id="task-card-template">
+    <article class="task-card">
+      <div class="task-check-wrap">
+        <button class="check-button" type="button" data-action="toggle" aria-label="Marcar tarea">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="task-main">
+        <div class="task-topline">
+          <span class="category" data-field="category"></span>
+          <span class="priority" data-field="priority"></span>
+        </div>
+        <h3 data-field="title"></h3>
+        <p data-field="description"></p>
+      </div>
+      <div class="task-actions" aria-label="Acciones de tarea">
+        <button class="icon-button" type="button" data-action="edit" aria-label="Editar tarea">✎</button>
+        <button class="icon-button danger" type="button" data-action="delete" aria-label="Eliminar tarea">⌫</button>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
